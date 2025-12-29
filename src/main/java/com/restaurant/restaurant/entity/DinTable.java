@@ -22,6 +22,7 @@ public class DinTable extends BaseEntity {
     private Long tableId;
 
     private Integer seats;
+
     private String location;
 
     @Enumerated(EnumType.STRING)
