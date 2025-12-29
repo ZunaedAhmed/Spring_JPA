@@ -1,6 +1,7 @@
 package com.restaurant.restaurant.command;
 
 import com.restaurant.restaurant.entity.OrderEntity;
+import com.restaurant.restaurant.model.OrderFormModel;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,5 +19,5 @@ public class OrderCommand implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Valid
-    private OrderEntity orderEntity;
+    private OrderFormModel formModel;
 }
