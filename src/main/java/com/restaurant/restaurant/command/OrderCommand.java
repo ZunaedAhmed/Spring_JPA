@@ -1,6 +1,5 @@
 package com.restaurant.restaurant.command;
 
-import com.restaurant.restaurant.entity.OrderEntity;
 import com.restaurant.restaurant.model.OrderFormModel;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
