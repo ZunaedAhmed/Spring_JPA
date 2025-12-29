@@ -1,0 +1,10 @@
+/* Basic project styles — loaded after Bootstrap so these override defaults */
+body {
+  padding-top: 60px;
+  background-color: #f8f9fa;
+}
+.navbar-brand { font-weight: 600; }
+.card { box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+.table thead th { background-color: #f1f3f5; }
+.container-main { max-width: 1100px; }
+.footer { padding: 1rem 0; color: #6c757d; }
