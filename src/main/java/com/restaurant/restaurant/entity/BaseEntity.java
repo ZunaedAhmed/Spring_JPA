@@ -34,4 +34,3 @@ public abstract class BaseEntity implements Serializable {
         this.lastUpdated = LocalDateTime.now();
     }
 }
-

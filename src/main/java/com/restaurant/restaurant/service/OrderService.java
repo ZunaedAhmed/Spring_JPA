@@ -1,10 +1,10 @@
 package com.restaurant.restaurant.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.restaurant.restaurant.entity.OrderEntity;
 import com.restaurant.restaurant.model.OrderFormModel;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface OrderService {
 
@@ -15,5 +15,4 @@ public interface OrderService {
     OrderEntity doSave(OrderFormModel orderForm);
 
     void deleteById(Long id);
-
 }

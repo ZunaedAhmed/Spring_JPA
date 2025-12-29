@@ -1,11 +1,13 @@
 package com.restaurant.restaurant.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
-public class OrderFormModel {
+@EqualsAndHashCode(callSuper = false)
+public class OrderFormModel extends BaseFormModel {
     private Long customerId;
     private Long staffId;
     private Long tableId;

@@ -1,8 +1,9 @@
 package com.restaurant.restaurant.controller;
 
-import com.restaurant.restaurant.service.MenuItemService;
 import com.restaurant.restaurant.entity.MenuItem;
 import com.restaurant.restaurant.repository.CategoryRepository;
+import com.restaurant.restaurant.service.MenuItemService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,15 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
+@RequiredArgsConstructor
 public class MenuController {
-
     private final MenuItemService menuItemService;
     private final CategoryRepository categoryRepository;
-
-    public MenuController(MenuItemService menuItemService, CategoryRepository categoryRepository) {
-        this.menuItemService = menuItemService;
-        this.categoryRepository = categoryRepository;
-    }
 
     @GetMapping("/menu")
     public String menu(Model model) {

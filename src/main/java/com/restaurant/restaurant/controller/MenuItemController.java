@@ -2,27 +2,19 @@ package com.restaurant.restaurant.controller;
 
 import com.restaurant.restaurant.entity.MenuItem;
 import com.restaurant.restaurant.service.MenuItemService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/menu-items")
 public class MenuItemController {
-
     private final MenuItemService service;
-
-    public MenuItemController(MenuItemService service) {
-        this.service = service;
-    }
 
     @GetMapping
     public List<MenuItem> list() {
@@ -35,8 +27,8 @@ public class MenuItemController {
     }
 
     @PostMapping
-    public ResponseEntity<MenuItem> create(@RequestBody MenuItem m) {
-        MenuItem saved = service.save(m);
+    public ResponseEntity<MenuItem> create(@RequestBody MenuItem menuItem) {
+        MenuItem saved = service.save(menuItem);
         return ResponseEntity.created(URI.create("/api/menu-items/" + saved.getMenuItemId())).body(saved);
     }
 

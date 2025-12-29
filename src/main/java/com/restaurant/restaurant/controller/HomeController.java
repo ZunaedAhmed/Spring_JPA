@@ -4,8 +4,9 @@ import com.restaurant.restaurant.entity.Customer;
 import com.restaurant.restaurant.entity.DinTable;
 import com.restaurant.restaurant.entity.MenuItem;
 import com.restaurant.restaurant.repository.DinTableRepository;
-import com.restaurant.restaurant.service.MenuItemService;
 import com.restaurant.restaurant.service.CustomerService;
+import com.restaurant.restaurant.service.MenuItemService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,20 +14,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class HomeController {
-
     private final MenuItemService menuItemService;
     private final CustomerService customerService;
     private final DinTableRepository tableRepository;
 
-    public HomeController(MenuItemService menuItemService, CustomerService customerService,
-            DinTableRepository tableRepository) {
-        this.menuItemService = menuItemService;
-        this.customerService = customerService;
-        this.tableRepository = tableRepository;
-    }
-
-    @GetMapping({ "/", "/index" })
+    @GetMapping({"/", "/index"})
     public String index(Model model) {
         List<MenuItem> menuItems = menuItemService.findAll();
         List<Customer> customers = customerService.findAll();

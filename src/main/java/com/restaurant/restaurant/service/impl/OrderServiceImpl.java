@@ -4,101 +4,102 @@ import com.restaurant.restaurant.entity.Customer;
 import com.restaurant.restaurant.entity.OrderEntity;
 import com.restaurant.restaurant.entity.OrderItem;
 import com.restaurant.restaurant.model.OrderFormModel;
+import com.restaurant.restaurant.model.enums.OrderStatus;
+import com.restaurant.restaurant.model.enums.OrderType;
 import com.restaurant.restaurant.repository.CustomerRepository;
 import com.restaurant.restaurant.repository.MenuItemRepository;
 import com.restaurant.restaurant.repository.OrderRepository;
 import com.restaurant.restaurant.service.DineService;
 import com.restaurant.restaurant.service.OrderService;
-
 import jakarta.transaction.Transactional;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-
-    private final OrderRepository repository;
+    private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
     private final DineService dineService;
     private final MenuItemRepository menuItemRepository;
 
-    public OrderServiceImpl(OrderRepository repository, CustomerRepository customerRepository,
-            DineService dineService, MenuItemRepository menuItemRepository) {
-        this.repository = repository;
-        this.customerRepository = customerRepository;
-        this.dineService = dineService;
-        this.menuItemRepository = menuItemRepository;
-    }
-
     @Override
     public List<OrderEntity> findAll() {
-        List<OrderEntity> orders = repository.findAll();
-        return orders;
+        return orderRepository.findAll();
     }
 
     @Override
     public Optional<OrderEntity> findById(Long id) {
-        return repository.findById(id);
+        return orderRepository.findById(id);
     }
 
     @Override
     @Transactional
     public OrderEntity doSave(OrderFormModel orderForm) {
         OrderEntity order = new OrderEntity();
-        Customer customer = customerRepository.findById(orderForm.getCustomerId())
+        Customer customer = customerRepository
+                .findById(orderForm.getCustomerId())
                 .orElseGet(() -> {
-                    Customer newCustomer = new Customer();
-                    // newCustomer.setCustomerId(orderForm.getCustomerId());
-                    newCustomer.setName("GUEST");
-                    return newCustomer;
+                    Customer guest = new Customer();
+                    guest.setName("GUEST");
+                    return customerRepository.save(guest);
                 });
         order.setCustomer(customer);
-        if (orderForm.getTableId() != null)
-            dineService.findById(orderForm.getTableId()).ifPresent(order::setTable);
-        order.setOrderType(orderForm.getOrderType());
-        order.setStatus("NEW");
-
+        if (orderForm.getTableId() != null) {
+            dineService.findById(orderForm.getTableId())
+                    .ifPresent(order::setTable);
+        }
+        OrderType type = OrderType.fromCode(orderForm.getOrderType());
+        order.setOrderType(
+                type != OrderType.CANCELED ? type : OrderType.DINE_IN
+        );
+        order.setStatus(OrderStatus.NEW);
+        order.getItems().clear();
         BigDecimal total = BigDecimal.ZERO;
         if (orderForm.getItemIds() != null && !orderForm.getItemIds().isEmpty()) {
             for (int i = 0; i < orderForm.getItemIds().size(); i++) {
-                Long mid = Long.parseLong(orderForm.getItemIds().get(i));
-                Integer qty = (orderForm.getQuantities() != null && orderForm.getQuantities().size() > i)
+                Long menuItemId = Long.parseLong(orderForm.getItemIds().get(i));
+                int quantity = (orderForm.getQuantities() != null &&
+                        orderForm.getQuantities().size() > i)
                         ? orderForm.getQuantities().get(i)
                         : 1;
-                menuItemRepository.findById(mid).ifPresent(menuItem -> {
-                    OrderItem oi = new OrderItem();
-                    oi.setMenuItem(menuItem);
-                    oi.setQuantity(qty);
-                    oi.setUnitPrice(menuItem.getPrice());
-                    BigDecimal line = menuItem.getPrice().multiply(BigDecimal.valueOf(qty));
-                    oi.setLineTotal(line);
-                    oi.setOrder(order);
-                    order.getItems().add(oi);
+                if (quantity <= 0) continue;
+                menuItemRepository.findById(menuItemId).ifPresent(menuItem -> {
+                    OrderItem item = new OrderItem();
+                    item.setMenuItem(menuItem);
+                    item.setQuantity(quantity);
+                    item.setUnitPrice(menuItem.getPrice());
+                    BigDecimal lineTotal = menuItem.getPrice().multiply(BigDecimal.valueOf(quantity));
+                    item.setLineTotal(lineTotal);
+                    order.addItem(item);
                 });
             }
-            for (OrderItem it : order.getItems()) {
-                total = total.add(it.getLineTotal() != null ? it.getLineTotal() : BigDecimal.ZERO);
-            }
+            total = order.getItems().stream()
+                    .map(OrderItem::getLineTotal)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
             order.setTotalAmount(total);
         }
-
-        if (order.getOrderDate() == null)
-            order.setOrderDate(LocalDate.now());
-        if (order.getOrderTime() == null)
-            order.setOrderTime(LocalTime.now());
-        // Note: further business rules (totals, stock checks) should be implemented in
-        // service layer
-        return repository.save(order);
+        order.setOrderDate(
+                Optional.ofNullable(order.getOrderDate())
+                        .orElse(LocalDate.now())
+        );
+        order.setOrderTime(
+                Optional.ofNullable(order.getOrderTime())
+                        .orElse(LocalTime.now())
+        );
+        return orderRepository.save(order);
     }
 
     @Override
     public void deleteById(Long id) {
-        repository.deleteById(id);
+        orderRepository.deleteById(id);
     }
 }

@@ -1,9 +1,9 @@
 package com.restaurant.restaurant.service;
 
+import com.restaurant.restaurant.entity.MenuItem;
+
 import java.util.List;
 import java.util.Optional;
-
-import com.restaurant.restaurant.entity.MenuItem;
 
 public interface MenuItemService {
     List<MenuItem> findAll();
