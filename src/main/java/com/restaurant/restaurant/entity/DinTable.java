@@ -1,39 +1,43 @@
 package com.restaurant.restaurant.entity;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.restaurant.restaurant.model.enums.TableStatus;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "din_table")
 @Data
-@Setter
-@Getter
+@Entity
+@Builder
 @NoArgsConstructor
-public class DinTable {
+@Table(name = "din_table")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class DinTable extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long tableId;
 
     private Integer seats;
-
     private String location;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private TableStatus status;
 
-    @OneToMany(mappedBy = "table")
-    private List<OrderEntity> orders = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "table",
+            fetch = FetchType.LAZY
+    )
+    @ToString.Exclude
+    private List<OrderEntity> orders;
 
+    public List<OrderEntity> getOrders() {
+        if (orders == null) {
+            orders = new ArrayList<>();
+        }
+        return orders;
+    }
 }

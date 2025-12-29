@@ -1,43 +1,41 @@
 package com.restaurant.restaurant.entity;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.restaurant.restaurant.model.enums.PaymentMethod;
+import com.restaurant.restaurant.model.enums.PaymentStatus;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "payment")
 @Data
-@Setter
-@Getter
+@Entity
+@Builder
 @NoArgsConstructor
-public class Payment {
+@Table(name = "payment")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class Payment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long paymentId;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private OrderEntity order;
 
     private BigDecimal amount;
 
-    private String method; // CASH / CARD / ONLINE
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod method;
 
-    private String status; // PENDING / COMPLETED / FAILED
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
 
     private LocalDateTime paidAt;
 
+    void setOrder(OrderEntity order) {
+        this.order = order;
+    }
 }

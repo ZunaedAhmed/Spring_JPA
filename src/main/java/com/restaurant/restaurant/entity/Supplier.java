@@ -1,30 +1,23 @@
 package com.restaurant.restaurant.entity;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "supplier")
 @Data
-@Setter
-@Getter
+@Entity
+@Builder
 @NoArgsConstructor
-public class Supplier {
+@Table(name = "supplier")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class Supplier extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long supplierId;
 
     private String name;
@@ -33,7 +26,17 @@ public class Supplier {
 
     private String email;
 
-    @OneToMany(mappedBy = "supplier")
-    private List<InventoryItem> inventory = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "supplier",
+            fetch = FetchType.LAZY
+    )
+    @ToString.Exclude
+    private List<InventoryItem> inventory;
 
+    public List<InventoryItem> getInventory() {
+        if (inventory == null) {
+            inventory = new ArrayList<>();
+        }
+        return inventory;
+    }
 }

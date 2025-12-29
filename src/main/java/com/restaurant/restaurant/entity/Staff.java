@@ -1,37 +1,42 @@
 package com.restaurant.restaurant.entity;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.restaurant.restaurant.model.enums.StaffRole;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "staff")
 @Data
-@Setter
-@Getter
+@Entity
+@Builder
 @NoArgsConstructor
-public class Staff {
+@Table(name = "staff")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class Staff extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long staffId;
 
     private String name;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private StaffRole role;
 
-    @OneToMany(mappedBy = "staff")
-    private List<OrderEntity> orders = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "staff",
+            fetch = FetchType.LAZY
+    )
+    @ToString.Exclude
+    private List<OrderEntity> orders;
 
+    public List<OrderEntity> getOrders() {
+        if (orders == null) {
+            orders = new ArrayList<>();
+        }
+        return orders;
+    }
 }

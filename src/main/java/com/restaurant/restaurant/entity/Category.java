@@ -1,35 +1,34 @@
 package com.restaurant.restaurant.entity;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "category")
 @Data
-@Setter
-@Getter
+@Entity
+@Builder
 @NoArgsConstructor
-public class Category {
+@Table(name = "category")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class Category extends BaseEntity {
 
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
 
     private String name;
 
     @OneToMany(mappedBy = "category")
-    private List<MenuItem> items = new ArrayList<>();
+    private List<MenuItem> items;
 
+    public List<MenuItem> getItems() {
+        if (items == null) {
+            items = new ArrayList<>();
+        }
+        return items;
+    }
 }

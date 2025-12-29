@@ -1,8 +1,8 @@
 package com.restaurant.restaurant.model;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class OrderFormModel {
@@ -13,5 +13,4 @@ public class OrderFormModel {
     private String orderType;
     private Long manuOrderId;
     private List<Integer> quantities;
-
 }

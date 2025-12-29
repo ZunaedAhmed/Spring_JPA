@@ -1,33 +1,24 @@
 package com.restaurant.restaurant.entity;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "inventory_item")
 @Data
-@Setter
-@Getter
+@Entity
+@Builder
 @NoArgsConstructor
-public class InventoryItem {
+@Table(name = "inventory_item")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+public class InventoryItem extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long inventoryItemId;
 
     private String name;
@@ -38,11 +29,21 @@ public class InventoryItem {
 
     private BigDecimal reorderLevel;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
 
-    @ManyToMany(mappedBy = "inventory")
-    private List<MenuItem> menuItems = new ArrayList<>();
+    @ManyToMany(
+            mappedBy = "inventory",
+            fetch = FetchType.LAZY
+    )
+    @ToString.Exclude
+    private List<MenuItem> menuItems;
 
+    public List<MenuItem> getMenuItems() {
+        if (menuItems == null) {
+            menuItems = new ArrayList<>();
+        }
+        return menuItems;
+    }
 }
